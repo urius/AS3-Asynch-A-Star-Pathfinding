@@ -80,8 +80,8 @@ public class AStar {
     }
 
 
-    public function resetCache():void {
-        _startsPoints = new StartPoints();
+    public function resetCache(quick:Boolean = false):void {
+        _startsPoints.clear(quick);
     }
 
     private function _restorePath(endPointData:PointData):Vector.<IAStarPoint> {
@@ -144,6 +144,15 @@ class StartPoints{
         }
         return _startPointsDict[from];
     }
+
+    public function clear(quick:Boolean):void {
+        for (var point:Object in _startPointsDict) {
+            if(quick) {
+                (_startPointsDict[point] as ReachablePoints).clear();
+            }
+            delete _startPointsDict[point];
+        }
+    }
 }
 
 class ReachablePoints {
@@ -169,6 +178,12 @@ class ReachablePoints {
 
     public function get $raw():Dictionary {
         return _reachables;
+    }
+
+    public function clear():void {
+        for (var point:Object in _reachables) {
+            delete _reachables[point];
+        }
     }
 }
 

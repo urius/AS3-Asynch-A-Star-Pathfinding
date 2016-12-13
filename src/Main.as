@@ -59,7 +59,7 @@ public class Main extends Sprite {
             //(point).point.markAsViewed();
         }
 
-        //_aStar.resetCache();
+        _aStar.resetCache();
 
     }
 }
