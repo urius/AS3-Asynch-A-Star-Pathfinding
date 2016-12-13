@@ -77,5 +77,9 @@ public class TestRectGrid extends Sprite implements IAStarGrid{
         //return Math.sqrt(Math.pow(_targetPoint1.xCoord - _targetPoint2.xCoord, 2) + Math.pow(_targetPoint1.yCoord - _targetPoint2.yCoord, 2));
         return (Math.pow(_targetPoint1.xCoord - _targetPoint2.xCoord, 2) + Math.pow(_targetPoint1.yCoord - _targetPoint2.yCoord, 2));
     }
+
+    public function getMoveCost(toPoint:IAStarPoint):int {
+        return (toPoint as TestPoint).moveCost;
+    }
 }
 }

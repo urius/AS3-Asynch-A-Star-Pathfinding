@@ -3,7 +3,8 @@
  */
 package com.twinpixel.astar {
 public interface IAStarPoint {
-    function get moveCost():int
+    function get aStarPointId():String
+
 
 }
 }

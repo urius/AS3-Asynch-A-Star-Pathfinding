@@ -6,6 +6,8 @@ import com.twinpixel.astar.IAStarPoint;
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.text.TextField;
+import flash.utils.Dictionary;
+import flash.utils.setTimeout;
 
 import testgrid.TestPoint;
 
@@ -24,17 +26,28 @@ public class Main extends Sprite {
         _grid.y = 50;
         addChild(_grid);
 
-        _getPathAStar(_grid);
+        setTimeout(_getPathAStar, 200, _grid);
     }
 
 
 
     private function _getPathAStar(_grid:TestRectGrid):void {
-         var _path:Vector.<IAStarPoint> = new AStar(_grid).findPath(_grid.getPoint(0,0), _grid.getPoint(1,14))
+        var time1:Number = new Date().milliseconds;
+
+
+         var _aStar:AStar = new AStar(_grid);
+         var _path:Vector.<IAStarPoint> = _aStar.findPath(_grid.getPoint(0,0), _grid.getPoint(1,14))
          trace(_path);
          for (var i:int = 0; i < _path.length; i++) {
             (_path[i] as TestPoint).markAsPath(i);
          }
+
+        trace("Path finding time: " + (new Date().milliseconds - time1));
+
+        var _pointsData:Dictionary = _aStar.$pointsData;
+        for each (var point:Object in _pointsData) {
+            (point).point.markAsViewed();
+        }
     }
 }
 }

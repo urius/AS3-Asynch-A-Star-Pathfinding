@@ -7,5 +7,7 @@ public interface IAStarGrid {
 
     function getHeuristicDistance(point1:IAStarPoint, point2:IAStarPoint):Number;
 
+    function getMoveCost(toPoint:IAStarPoint):int
+
 }
 }

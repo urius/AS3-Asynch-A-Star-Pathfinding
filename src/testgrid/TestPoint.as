@@ -15,6 +15,7 @@ public class TestPoint extends Shape implements IAStarPoint{
     private var _size:int = 40;
     private var _markedAsPath:Boolean = false;
     private var _stepTxt:TextField;
+    private var _markedAsViewed:Boolean = false;
 
     public function TestPoint(xCoord:int, yCoord:int, moveCost:int) {
         _xCoord = xCoord;
@@ -40,7 +41,9 @@ public class TestPoint extends Shape implements IAStarPoint{
 
     public function render():void {
         this.graphics.clear();
-        if(_markedAsPath){
+        if(_markedAsViewed){
+            this.graphics.beginFill(0xff00ff, 0.5);
+        } else if(_markedAsPath){
             this.graphics.beginFill(0x0000ff, 0.5);
         } else {
             this.graphics.beginFill((_moveCost > 0)?0x00ff00:0xff0000, 0.5);
@@ -70,6 +73,17 @@ public class TestPoint extends Shape implements IAStarPoint{
         _stepTxt.text = stepNum+""
 
         render();
+    }
+
+    public function markAsViewed():void {
+        if(_markedAsPath == false){
+            _markedAsViewed = true;
+        }
+        render();
+    }
+
+    public function get aStarPointId():String {
+        return "x"+_xCoord+"y"+_yCoord;
     }
 }
 }

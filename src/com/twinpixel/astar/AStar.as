@@ -21,40 +21,48 @@ public class AStar {
         var openList:Vector.<PointData> = new Vector.<PointData>();
         var closedList:Vector.<PointData> = new Vector.<PointData>();
 
-        _pointsData[startPoint] = new PointData(startPoint, 0, _grid.getHeuristicDistance(startPoint,endPoint));
+        _pointsData[startPoint] = new PointData(startPoint, _grid.getHeuristicDistance(startPoint,endPoint), _grid.getMoveCost(startPoint));
         openList.push(_pointsData[startPoint]);
 
 
         var currentPoint:PointData = null;
         var neighbours:Vector.<IAStarPoint>;
+
+        var neighbourData:PointData;
+        var neighbour:IAStarPoint
+
+        var moveCost:int = 0;
+
         while(openList.length > 0){
             currentPoint = _pickPointWithMinF(openList, true);
             closedList.push(currentPoint);
 
-            if(currentPoint == endPoint){
+            if(currentPoint.point == endPoint){
                 break;
             }
 
             neighbours = _grid.getNearPoints(currentPoint.point);
-            var _neighbourData:PointData
-            neighbours.forEach(function(neighbour:IAStarPoint, index:int, origin:Vector.<IAStarPoint>):void{
-                if(neighbour.moveCost > 0 && _isInList(neighbour, closedList) == false){
-                    var g:int = currentPoint.g + neighbour.moveCost;
+
+
+            for each(neighbour in neighbours){
+                moveCost = _grid.getMoveCost(neighbour);
+                if(moveCost > 0 && _isInList(neighbour, closedList) == false){
+                    var g:int = currentPoint.g + moveCost;
                     var h:Number = _grid.getHeuristicDistance(neighbour, endPoint);
 
                     if(_isInList(neighbour, openList)){
-                        _neighbourData = _pointsData[neighbour] as PointData;
-                        if(g + h < _neighbourData.f()){
-                            _neighbourData.prevPointData = currentPoint;
+                        neighbourData = _pointsData[neighbour] as PointData;
+                        if(g + h < neighbourData.f()){
+                            neighbourData.prevPointData = currentPoint;
                         }
                     } else {
-                        _neighbourData = new PointData(neighbour, g, h);
-                        _pointsData[neighbour] = _neighbourData;
-                        _neighbourData.prevPointData = currentPoint;
-                        openList.push(_neighbourData);
+                        neighbourData = new PointData(neighbour, h, moveCost)
+                        _pointsData[neighbour] = neighbourData;
+                        neighbourData.prevPointData = currentPoint;
+                        openList.push(neighbourData);
                     }
                 }
-            })
+            }
         }
         if(_pointsData[endPoint]){
             return _restorePath(_pointsData[endPoint] as PointData);
@@ -101,6 +109,9 @@ public class AStar {
         return _result;
     }
 
+    public function get $pointsData():Dictionary {
+        return _pointsData;
+    }
 }
 }
 
@@ -113,10 +124,12 @@ class PointData{
     private var _heuristicDistance:Number;
     private var _g:int = 0;
     private var _f:Number = 0;
+    private var _moveCost:int;
 
-    public function PointData(point:IAStarPoint, g:int, heuristicDistance:Number):void {
+    public function PointData(point:IAStarPoint, heuristicDistance:Number, moveCost:int):void {
         _point = point;
-        _g = g;
+        _moveCost = moveCost;
+        _g = 0;
         _heuristicDistance = heuristicDistance;
         _f = _g + _heuristicDistance;
     }
@@ -127,7 +140,7 @@ class PointData{
 
     public function set prevPointData(value:PointData):void {
         _prevPointData = value;
-        _g = _prevPointData.g + _point.moveCost;
+        _g = _prevPointData.g + _moveCost;
         _f = _g + _heuristicDistance;
     }
 
