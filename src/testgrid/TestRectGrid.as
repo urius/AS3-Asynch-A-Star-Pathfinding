@@ -41,6 +41,14 @@ public class TestRectGrid extends Sprite implements IAStarGrid{
         }
     }
 
+    public function reset():void {
+        for (var i:int = 0; i < _grid.length; i++) {
+            for (var j:int = 0; j < _grid[i].length; j++) {
+                _grid[i][j].reset();
+            }
+        }
+    }
+
 
     public function getPoint(x:int, y:int):TestPoint {
         return _grid[x][y];

@@ -85,5 +85,10 @@ public class TestPoint extends Shape implements IAStarPoint{
     public function get aStarPointId():String {
         return "x"+_xCoord+"y"+_yCoord;
     }
+
+    public function reset():void {
+        _markedAsViewed = _markedAsPath = false;
+        render();
+    }
 }
 }
