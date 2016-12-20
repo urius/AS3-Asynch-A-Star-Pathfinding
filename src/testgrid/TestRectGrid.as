@@ -25,11 +25,32 @@ public class TestRectGrid extends Sprite implements IAStarGrid{
     private function createGrid():void {
 
         var _bufPoint:TestPoint;
-        for (var i:int = 0; i < 10; i++) {
+        for (var i:int = 0; i < 40; i++) {
             _grid[i] = new Vector.<TestPoint>();
-            for (var j:int = 0; j < 15; j++) {
+            for (var j:int = 0; j < 30; j++) {
                 var _walkable:int = 1;
                 if((j == 4 && i < 8) || (j == 8 && i>2) || (j==12 && i <8)){
+                    _walkable = 0;
+                }
+                if( i == 10 && j >18 && j < 28){
+                    _walkable = 0;
+                }
+                if( (i == 16 || i == 22 || i== 28 || i == 36) && j >8 && j < 18){
+                    _walkable = 0;
+                }
+                if( (i == 18 || i == 24 || i== 32) && j >12 && j < 22){
+                    _walkable = 0;
+                }
+                if( j == 22 && i > 10 && i < 38){
+                    _walkable = 0;
+                }
+                if( j == 24 && i > 12){
+                    _walkable = 0;
+                }
+                if( j == 28 && i< 38){
+                    _walkable = 0;
+                }
+                if(i == 2 && j > 28){
                     _walkable = 0;
                 }
                 _bufPoint = new TestPoint(i,j,_walkable);

@@ -12,7 +12,7 @@ public class TestPoint extends Shape implements IAStarPoint{
     private var _xCoord:int;
     private var _yCoord:int;
 
-    private var _size:int = 40;
+    private var _size:int = 20;
     private var _markedAsPath:Boolean = false;
     private var _stepTxt:TextField;
     private var _markedAsViewed:Boolean = false;

@@ -14,7 +14,7 @@ import testgrid.TestPoint;
 
 import testgrid.TestRectGrid;
 
-[SWF (width = 800, height = 800)]
+[SWF (width = 1000, height = 800)]
 public class Main extends Sprite {
     private var _aStar:AStar;
 
@@ -32,10 +32,10 @@ public class Main extends Sprite {
 
         //setTimeout(_getPathAStar, 100, _grid, new Point(0,0), new Point(9,0));
         setTimeout(_getPathAStar, 200, _grid, new Point(0,0), new Point(1,14));
-        setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(1,14));
+//        setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(8,14));
         setTimeout(_getPathAStar, 400, _grid, new Point(0,0), new Point(1,13));
-        setTimeout(_getPathAStar, 500, _grid, new Point(0,0), new Point(3, 2));
-        setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(9, 0));
+        setTimeout(_getPathAStar, 500, _grid, new Point(0,0), new Point(9, 2));
+        setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(4, 29));
     }
 
 
@@ -46,20 +46,25 @@ public class Main extends Sprite {
         //_aStar = new AStar(_grid);
 
          var _path:Vector.<IAStarPoint> = _aStar.findPath(_grid.getPoint(point1.x,point1.y), _grid.getPoint(point2.x,point2.y))
-         trace(_path);
-        _grid.reset();
-         for (var i:int = 0; i < _path.length; i++) {
-            (_path[i] as TestPoint).markAsPath(i);
-         }
 
-        trace("Path finding time: " + (new Date().milliseconds - time1));
+        trace(point1 + " - " + point2 + ":  "+"Path finding time: " + (new Date().milliseconds - time1));
+
+        _grid.reset();
+        if(_path){
+            for (var i:int = 0; i < _path.length; i++) {
+                (_path[i] as TestPoint).markAsPath(i);
+            }
+        } else {
+            trace("PATH is NULL")
+        }
+
 
         var _pointsData:Dictionary = _aStar.$pointsData;
         for each (var point:Object in _pointsData) {
             //(point).point.markAsViewed();
         }
 
-        _aStar.resetCache();
+        //_aStar.resetCache();
 
     }
 }
