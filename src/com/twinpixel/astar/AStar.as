@@ -18,7 +18,7 @@ public class AStar {
 
     //private var _pointsData:Dictionary;
     private var _$pointsData:ReachablePoints;
-    public function findPath(startPoint:IAStarPoint, endPoint:IAStarPoint, fast:Boolean = false):Vector.<IAStarPoint> {
+    public function findPath(startPoint:IAStarPoint, endPoint:IAStarPoint, fast:Boolean = true):Vector.<IAStarPoint> {
         var _reachablePointsData:ReachablePoints;
 
         if(_calculatedStartPoints.pointIsCalculated(startPoint)){
