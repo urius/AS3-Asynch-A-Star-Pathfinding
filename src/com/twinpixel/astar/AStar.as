@@ -5,6 +5,7 @@ package com.twinpixel.astar {
 
 
 import flash.utils.Dictionary;
+import flash.utils.setTimeout;
 
 public class AStar {
     private var _grid:IAStarGrid;
@@ -69,15 +70,12 @@ public class AStar {
                     var h:Number = endPoint?_grid.getHeuristicDistance(neighbour, endPoint):0;
 
                     if(_isInList(neighbour,reachablePointsData, openList)){
-                        //neighbourData = _pointsData[neighbour] as PointData;
                         neighbourData = reachablePointsData.getPointData(neighbour);
                         if(g + h < neighbourData.f()){
                             neighbourData.prevPointData = currentPoint;
                         }
                     } else {
-                        //neighbourData = new PointData(neighbour, h, moveCost)
                         neighbourData = reachablePointsData.createOrUpdatePointData(neighbour, h, moveCost);
-                        //_pointsData[neighbour] = neighbourData;
                         neighbourData.prevPointData = currentPoint;
                         openList.push(neighbourData);
                     }
@@ -98,7 +96,62 @@ public class AStar {
         findPath(startPoint, null, false);
     }
 
-    private function _findPathCore(reachablePointsData:ReachablePoints,openList:Vector.<PointData>, closedList:Vector.<PointData>, endPoint:IAStarPoint, fast:Boolean):void {
+    public function findPathAsync(startPoint:IAStarPoint, endPoint:IAStarPoint, callback:Function):void {
+
+        var reachablePointsData:ReachablePoints = new ReachablePoints(startPoint);
+
+        var openList:Vector.<PointData> = new <PointData>[];
+        var closedList:Vector.<PointData> = new <PointData>[];
+
+        openList.push(reachablePointsData.createOrUpdatePointData(startPoint, _grid.getHeuristicDistance(startPoint,endPoint), _grid.getMoveCost(startPoint)));
+
+        _findPathAsyncCore(reachablePointsData, openList, closedList, endPoint, callback);
+
+    }
+
+    private function _findPathAsyncCore(reachablePointsData:ReachablePoints, openList:Vector.<PointData>, closedList:Vector.<PointData>, endPoint:IAStarPoint, callback:Function):void {
+        var currentPoint:PointData;
+        var neighbours:Vector.<IAStarPoint>;
+        var neighbourData:PointData;
+        var neighbour:IAStarPoint;
+        var moveCost:int = 0;
+
+        var steps:int = 100;
+
+        while (steps > 0){
+            steps --;
+            if(openList.length > 0){
+                currentPoint = _pickPointWithMinF(openList);
+                closedList.push(currentPoint);
+
+                neighbours = _grid.getNearPoints(currentPoint.point);
+
+                for each(neighbour in neighbours){
+                    moveCost = _grid.getMoveCost(neighbour);
+                    if(moveCost > 0 && _isInList(neighbour,reachablePointsData, closedList) == false){
+                        var g:int = currentPoint.g + moveCost;
+                        var h:Number = endPoint?_grid.getHeuristicDistance(neighbour, endPoint):0;
+
+                        if(_isInList(neighbour,reachablePointsData, openList)){
+                            neighbourData = reachablePointsData.getPointData(neighbour);
+                            if(g + h < neighbourData.f()){
+                                neighbourData.prevPointData = currentPoint;
+                            }
+                        } else {
+                            neighbourData = reachablePointsData.createOrUpdatePointData(neighbour, h, moveCost);
+                            neighbourData.prevPointData = currentPoint;
+                            openList.push(neighbourData);
+                        }
+                    }
+                }
+            } else {
+                callback(_restorePath(reachablePointsData.getPointData(endPoint)));
+                return;
+            }
+        }
+        if(steps <= 0){
+            setTimeout(_findPathAsyncCore, 0, reachablePointsData,openList,closedList,endPoint,callback);
+        }
 
     }
 
