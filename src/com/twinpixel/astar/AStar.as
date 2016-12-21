@@ -65,6 +65,11 @@ public class AStar extends EventDispatcher{
         return _restorePath(reachablePointsData.getPointData(endPoint));
     }
 
+    public function precalculatePointAsync(startPoint:IAStarPoint, callback:Function = null):void {
+        findPathAsync(startPoint, null, false, function (path:Vector.<IAStarPoint>):void {
+            if(callback && callback.length == 0) callback();
+        })
+    }
 
     public function findPathAsync(startPoint:IAStarPoint, endPoint:IAStarPoint,fast:Boolean = true, callback:Function = null):void {
         if(_calculatedStartPoints.pointIsCalculated(startPoint) && endPoint){
@@ -77,7 +82,7 @@ public class AStar extends EventDispatcher{
         var openList:Vector.<PointData> = new <PointData>[];
         var closedList:Vector.<PointData> = new <PointData>[];
 
-        openList.push(reachablePointsData.createOrUpdatePointData(startPoint, _grid.getHeuristicDistance(startPoint,endPoint), _grid.getMoveCost(startPoint)));
+        openList.push(reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint)));
 
         _findPathAsyncCore(reachablePointsData, openList, closedList, endPoint, fast, callback);
     }
