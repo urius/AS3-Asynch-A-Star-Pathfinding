@@ -1,6 +1,7 @@
 package {
 
 import com.twinpixel.astar.AStar;
+import com.twinpixel.astar.Events.AStarEvent;
 import com.twinpixel.astar.IAStarPoint;
 
 import flash.display.Shape;
@@ -32,17 +33,20 @@ public class Main extends Sprite {
 
         _aStar = new AStar(_grid);
 
-       // _aStar.precalculatePoint(_grid.getPoint(0,0))
-       // setTimeout(_getPathAStar, 100, _grid, new Point(0,0), new Point(9,0));
+        //_aStar.precalculatePoint(_grid.getPoint(0,0))
+        _aStar.precalculatePoint(_grid.getPoint(0,0))
+        setTimeout(_getPathAStar, 100, _grid, new Point(0,0), new Point(9,0));
         //setTimeout(_getPathAStar, 200, _grid, new Point(0,0), new Point(1,14));
-//        setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(8,14));
+        //setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(8,14));
         //setTimeout(_getPathAStar, 400, _grid, new Point(0,0), new Point(1,13));
         //setTimeout(_getPathAStar, 500, _grid, new Point(0,0), new Point(9, 2));
-        //setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(4, 29));
+        setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(4, 29));
+        setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(0, 29));
 
         addEventListener(Event.ENTER_FRAME, _frameCounter)
-        _findAsync(_grid);
+        //_findAsync(_grid);
     }
+
 
 
     private var _framesPassed:int = 0;
@@ -54,7 +58,22 @@ public class Main extends Sprite {
         var time1:int = getTimer();
         var frames1:int = _framesPassed;
         trace("Async Path start, time: " + time1);
-        _aStar.findPathAsync(_grid.getPoint(0,0), _grid.getPoint(4,29), findPathAsyncHandler)
+        _aStar.findPathAsync(_grid.getPoint(0,0), _grid.getPoint(0,29), false, findPathAsyncHandler)
+
+        function findPathAsyncHandler(path:Vector.<IAStarPoint>):void {
+            var _time2:int = getTimer();
+            trace(_time2 + "  Async Path finding time: " + (_time2 - time1) + " frames passed:"+(_framesPassed - frames1));
+            drawPath(_grid, path);
+
+            _findAsync2(_grid);
+        }
+    }
+
+    private function _findAsync2(_grid:TestRectGrid):void {
+        var time1:int = getTimer();
+        var frames1:int = _framesPassed;
+        trace("Async Path start, time: " + time1);
+        _aStar.findPathAsync(_grid.getPoint(0,0), _grid.getPoint(8,29),  true, findPathAsyncHandler)
 
         function findPathAsyncHandler(path:Vector.<IAStarPoint>):void {
             var _time2:int = getTimer();
