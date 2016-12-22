@@ -67,13 +67,17 @@ public class AStar extends EventDispatcher{
 
     public function precalculatePointAsync(startPoint:IAStarPoint, callback:Function = null):void {
         findPathAsync(startPoint, null, false, function (path:Vector.<IAStarPoint>):void {
-            if(callback && callback.length == 0) callback();
+            if(callback && callback.length == 0) {
+                callback();
+            } else if (callback){
+                throw new Error("[precalculatePointAsync] Callback must be a function without parameters'");
+            }
         })
     }
 
     public function findPathAsync(startPoint:IAStarPoint, endPoint:IAStarPoint,fast:Boolean = true, callback:Function = null):void {
         if(_calculatedStartPoints.pointIsCalculated(startPoint) && endPoint){
-            _dispathResult(_getCalculatedPath(startPoint, endPoint), callback);
+            _dispatchResult(_getCalculatedPath(startPoint, endPoint), callback);
             return;
         }
 
@@ -99,13 +103,13 @@ public class AStar extends EventDispatcher{
 
                 if(fast){
                     if(endPoint && currentPoint.point.aStarPointId == endPoint.aStarPointId){
-                        _dispathResult(_restorePath(reachablePointsData.getPointData(endPoint)), callback);
+                        _dispatchResult(_restorePath(reachablePointsData.getPointData(endPoint)), callback);
                         return;
                     }
                 }
                 _coreProcessNeighbours(reachablePointsData, _grid, openList, closedList, currentPoint, endPoint);
             } else {
-                _dispathResult(_restorePath(reachablePointsData.getPointData(endPoint)), callback);
+                _dispatchResult(_restorePath(reachablePointsData.getPointData(endPoint)), callback);
                 return;
             }
         }
@@ -114,10 +118,12 @@ public class AStar extends EventDispatcher{
         }
     }
 
-    private function _dispathResult( result:Vector.<IAStarPoint>, callback:Function):void {
+    private function _dispatchResult( result:Vector.<IAStarPoint>, callback:Function):void {
         dispatchEvent(new AStarEvent(AStarEvent.PATH_CALCULATED, result));
         if(callback && callback.length == 1){
             callback(result);
+        } else if (callback){
+            throw new Error("[findPathAsync] Callback must be a function with 1 parameter with type 'Vector.<IAStarPoint>'");
         }
     }
 
