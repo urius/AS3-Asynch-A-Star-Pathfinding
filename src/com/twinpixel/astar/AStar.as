@@ -14,7 +14,11 @@ import flash.utils.setTimeout;
 public class AStar extends EventDispatcher{
     private var _grid:IAStarGrid;
 
-
+    /**
+     * Defines, how many steps will be executed during one async iteration
+     * the less value, the less frame time will be occupied by the algorithm, and more total time will need to finish
+     */
+    public var ASYNC_ITERATION_STEPS:uint = 100;
 
     private var _calculatedStartPoints:StartPoints;
 
@@ -147,7 +151,7 @@ public class AStar extends EventDispatcher{
     private function _findPathAsyncCore(reachablePointsData:ReachablePoints, openList:Vector.<PointData>, closedList:Vector.<PointData>, endPoint:IAStarPoint, fast:Boolean, callback:Function):void {
         var currentPoint:PointData;
 
-        var steps:int = 100;
+        var steps:int = ASYNC_ITERATION_STEPS;
         while (steps > 0){
             steps --;
             if(openList.length > 0){

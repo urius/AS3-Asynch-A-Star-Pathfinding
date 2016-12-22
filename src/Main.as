@@ -33,20 +33,20 @@ public class Main extends Sprite {
 
         _aStar = new AStar(_grid);
 
-        _aStar.precalculatePoint(_grid.getPoint(0,0))
+        //_aStar.precalculatePoint(_grid.getPoint(0,0))
 
-        setTimeout(_getPathAStar, 100, _grid, new Point(0,0), new Point(9,0));
+        //setTimeout(_getPathAStar, 100, _grid, new Point(0,0), new Point(9,0));
         //setTimeout(_getPathAStar, 200, _grid, new Point(0,0), new Point(1,14));
-        setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(8,14));
+        //setTimeout(_getPathAStar, 300, _grid, new Point(0,0), new Point(8,14));
         //setTimeout(_getPathAStar, 400, _grid, new Point(0,0), new Point(1,13));
-        setTimeout(_getPathAStar, 500, _grid, new Point(0,0), new Point(9, 2));
-        setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(4, 29));
+        //setTimeout(_getPathAStar, 500, _grid, new Point(0,0), new Point(9, 2));
+        //setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(4, 29));
         //setTimeout(_getPathAStar, 800, _grid, new Point(0,0), new Point(0, 29));
 
         addEventListener(Event.ENTER_FRAME, _frameCounter)
 
         //_aStar.precalculatePointAsync(_grid.getPoint(0,0), function (){_findAsync(_grid)})
-        //_findAsync(_grid);
+        _findAsync(_grid);
     }
 
 
