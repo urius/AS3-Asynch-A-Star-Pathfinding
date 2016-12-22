@@ -40,14 +40,14 @@ public class AStar extends EventDispatcher{
 
         var openList:Vector.<PointData> = new Vector.<PointData>();
         var closedList:Vector.<PointData> = new Vector.<PointData>();
-
-        openList.push(reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint)));
+        var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
+        _addToOpenList(startPointData, openList);
 
         var currentPoint:PointData = null;
 
         while(openList.length > 0){
             currentPoint = _pickPointWithMinF(openList, true);
-            closedList.push(currentPoint);
+            _addToClosedList(currentPoint, closedList);
 
             if(fast){
                 if(currentPoint.point.aStarPointId == endPoint.aStarPointId){
@@ -58,6 +58,16 @@ public class AStar extends EventDispatcher{
         }
 
         return _restorePath(reachablePointsData.getPointData(endPoint));
+    }
+
+    private function _addToClosedList(pointData:PointData, closedList:Vector.<PointData>):void {
+        closedList.push(pointData);
+        pointData.inClosedList = true;
+    }
+
+    private function _addToOpenList(pointData:PointData, openList:Vector.<PointData>):void {
+        openList.push(pointData)
+        pointData.inOpenList = true;
     }
 
     private function _getCalculatedPath(startPoint:IAStarPoint, endPoint:IAStarPoint):Vector.<IAStarPoint> {
@@ -98,8 +108,8 @@ public class AStar extends EventDispatcher{
         while (steps > 0){
             steps --;
             if(openList.length > 0){
-                currentPoint = _pickPointWithMinF(openList);
-                closedList.push(currentPoint);
+                currentPoint = _pickPointWithMinF(openList, true);
+                _addToClosedList(currentPoint, closedList);
 
                 if(fast){
                     if(endPoint && currentPoint.point.aStarPointId == endPoint.aStarPointId){
@@ -138,11 +148,11 @@ public class AStar extends EventDispatcher{
 
         for each(neighbour in neighbours){
             moveCost = _grid.getMoveCost(neighbour);
-            if(moveCost > 0 && _isInList(neighbour,reachablePointsData, closedList) == false){
+            if(moveCost > 0 && _isInClosedList(neighbour,reachablePointsData) == false){
                 var g:int = currentPoint.g + moveCost;
                 var h:Number = endPoint?_grid.getHeuristicDistance(neighbour, endPoint):0;
 
-                if(_isInList(neighbour,reachablePointsData, openList)){
+                if(_isInOpenList(neighbour,reachablePointsData)){
                     neighbourData = reachablePointsData.getPointData(neighbour);
                     if(g + h < neighbourData.f()){
                         neighbourData.prevPointData = currentPoint;
@@ -150,7 +160,7 @@ public class AStar extends EventDispatcher{
                 } else {
                     neighbourData = reachablePointsData.createOrUpdatePointData(neighbour, h, moveCost);
                     neighbourData.prevPointData = currentPoint;
-                    openList.push(neighbourData);
+                    _addToOpenList(neighbourData, openList);
                 }
             }
         }
@@ -174,13 +184,18 @@ public class AStar extends EventDispatcher{
         return _result;
     }
 
-    private function _isInList(point:IAStarPoint, reachablesData:ReachablePoints, list:Vector.<PointData>):Boolean {
-        //var pointData:PointData = _pointsData[point];
+    private function _isInClosedList(point:IAStarPoint, reachablesData:ReachablePoints):Boolean {
         var pointData:PointData = reachablesData.getPointData(point);
         if(pointData != null){
-            if(list.indexOf(pointData) >= 0){
-                return true
-            }
+            return pointData.inClosedList;
+        }
+        return false;
+    }
+
+    private function _isInOpenList(point:IAStarPoint, reachablesData:ReachablePoints):Boolean {
+        var pointData:PointData = reachablesData.getPointData(point);
+        if(pointData != null){
+            return pointData.inOpenList;
         }
         return false;
     }
@@ -197,7 +212,10 @@ public class AStar extends EventDispatcher{
             }
         }
 
-        if(remove) points.removeAt(_resultIndex);
+        if(remove) {
+            points.removeAt(_resultIndex);
+            _result.inOpenList = false;
+        }
 
         return _result;
     }
@@ -246,6 +264,7 @@ class ReachablePoints {
     private var _from:IAStarPoint;
 
     private const _reachables:Dictionary = new Dictionary();
+
     public function ReachablePoints(from:IAStarPoint) {
         _from = from;
     }
@@ -254,6 +273,7 @@ class ReachablePoints {
         if(_reachables[point] == null){
             _reachables[point] = new PointData(point, heuristicDistance, moveCost);
         } else {
+            trace("Update Point");
             (_reachables[point] as PointData).heuristicDistance = heuristicDistance
         }
 
@@ -290,6 +310,10 @@ class PointData{
     private var _f:Number = 0;
     private var _moveCost:int;
 
+
+    private var _inOpenList:Boolean = false;
+    private var _inClosedList:Boolean = false;
+
     public function PointData(point:IAStarPoint, heuristicDistance:Number, moveCost:int):void {
         _point = point;
         _moveCost = moveCost;
@@ -297,6 +321,7 @@ class PointData{
         _heuristicDistance = heuristicDistance;
         _f = _g + _heuristicDistance;
     }
+
 
     public function get prevPointData():PointData {
         return _prevPointData;
@@ -326,5 +351,21 @@ class PointData{
 
     public function get point():IAStarPoint {
         return _point;
+    }
+
+    public function get inOpenList():Boolean {
+        return _inOpenList;
+    }
+
+    public function get inClosedList():Boolean {
+        return _inClosedList;
+    }
+
+    public function set inOpenList(value:Boolean):void {
+        _inOpenList = value;
+    }
+
+    public function set inClosedList(value:Boolean):void {
+        _inClosedList = value;
     }
 }
