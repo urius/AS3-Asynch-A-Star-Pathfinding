@@ -6,7 +6,6 @@ package com.twinpixel.astar {
 
 import com.twinpixel.astar.Events.AStarEvent;
 
-import flash.events.DataEvent;
 import flash.events.EventDispatcher;
 import flash.utils.Dictionary;
 import flash.utils.setTimeout;
@@ -18,16 +17,40 @@ public class AStar extends EventDispatcher{
 
 
     private var _calculatedStartPoints:StartPoints;
+
+    /**
+     * Init algorithm
+     * @param grid
+     * User defined grid of path cells, must implement IAStarGrid interface
+     */
     public function AStar(grid:IAStarGrid) {
         _grid = grid;
         _calculatedStartPoints = new StartPoints();
     }
 
+    /**
+     * Synchronous
+     * SLOW method!
+     * Calculates and caches all possible paths from a given point.
+     * @param startPoint - Start Point for calculated paths
+     */
     public function precalculatePoint(startPoint:IAStarPoint):void {
         findPath(startPoint, null, false);
     }
 
     private var _$pointsData:ReachablePoints;
+
+    /**
+     * Synchronous
+     * Calculates shortest possible path, using heuristic function
+     * @param startPoint
+     * @param endPoint
+     * @param fast
+     * if true, algorithm will stop, when first time meets endPoint. Caching is disabled
+     * if false, algorithm will check all possible cells, and return absolutely shortest path.
+     * Caching is enabled. Behaviour is similar to  precalculatePoint() function
+     * @return result path, presented as Vector.<IAStarPoint>
+     */
     public function findPath(startPoint:IAStarPoint, endPoint:IAStarPoint, fast:Boolean = true):Vector.<IAStarPoint> {
         if(_calculatedStartPoints.pointIsCalculated(startPoint) && endPoint){
             return _getCalculatedPath(startPoint, endPoint);
@@ -75,6 +98,15 @@ public class AStar extends EventDispatcher{
         return _restorePath(reachablePointsData.getPointData(endPoint));
     }
 
+    /**
+     * Asynchronous
+     * Similar to precalculatePoint(), but don't block main loop.
+     * Dispatch AStarEvent.PATH_CALCULATED event, when finish.
+     * @param startPoint
+     * @param callback
+     * Callback function, that will be called on finish.
+     * Signature: function callback() {}
+     */
     public function precalculatePointAsync(startPoint:IAStarPoint, callback:Function = null):void {
         findPathAsync(startPoint, null, false, function (path:Vector.<IAStarPoint>):void {
             if(callback && callback.length == 0) {
@@ -85,6 +117,17 @@ public class AStar extends EventDispatcher{
         })
     }
 
+    /**
+     * Asynchronous
+     * Async version of findPath()
+     * Dispatch AStarEvent.PATH_CALCULATED event, when finish.
+     * @param startPoint
+     * @param endPoint
+     * @param fast
+     * @param callback
+     * Callback function, that will be called on finish.
+     * Signature: function callback(path:Vector:<IAStarPoint>) {}
+     */
     public function findPathAsync(startPoint:IAStarPoint, endPoint:IAStarPoint,fast:Boolean = true, callback:Function = null):void {
         if(_calculatedStartPoints.pointIsCalculated(startPoint) && endPoint){
             _dispatchResult(_getCalculatedPath(startPoint, endPoint), callback);
@@ -166,6 +209,14 @@ public class AStar extends EventDispatcher{
         }
     }
 
+    /**
+     * CLear all cached data
+     * Use it, if some of your path costs was changed or
+     * if you no longer need to calculate paths
+     * @param quick
+     * if true, then removes only heads of data structures, more work to Garbage Collector
+     * if false, then will be executed deep cleaning
+     */
     public function resetCache(quick:Boolean = false):void {
         _calculatedStartPoints.clear(quick);
     }
