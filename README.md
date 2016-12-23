@@ -16,7 +16,7 @@
         Returns prediction of distance from one cell to any other cell. Constant can be returned for any pair of piints, but algorithm will be executed much more time.
 
     * `function getMoveCost(toPoint:IAStarPoint):int`
-        Returns hte cost of moving to a given cell (from any other near cells). Not walkable cells must return 0 or any negative number.
+        Returns hte cost of moving to a given cell (from any other near cells). Not walkable cells must return `0 or any negative number`.
 
 
 ####After you implement these Interfaces, you can use methods below:
@@ -41,4 +41,4 @@ Constructor, use it to prepare Algorithm for execution.
   - `callback:Function` optional complete handler. it must be a function with no parameters ( signature: `function callback():void {}` )
 
 
-  > Also you can change `ASYNC_ITERATION_STEPS` property on created `AStar` instance to achieve better algorithm asyncronous execution time. The more value, the more frame time will be by calculations, and the less total time will need. Default is `100` steps per frame.
+> Also you can change `ASYNC_ITERATION_STEPS` property on created `AStar` instance to achieve better algorithm asyncronous execution time. The more value, the more frame time will be by calculations, and the less total time will need. Default is `100` steps per frame.
