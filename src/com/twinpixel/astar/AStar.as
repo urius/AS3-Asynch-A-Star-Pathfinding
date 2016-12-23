@@ -3,11 +3,8 @@
  */
 package com.twinpixel.astar {
 
-
 import com.twinpixel.astar.Events.AStarEvent;
-
 import flash.events.EventDispatcher;
-import flash.utils.Dictionary;
 import flash.utils.setTimeout;
 
 [Event (name="PATH_CALCULATED", type="com.twinpixel.astar.Events.AStarEvent")]
@@ -42,8 +39,6 @@ public class AStar extends EventDispatcher{
         findPath(startPoint, null, false);
     }
 
-    private var _$pointsData:ReachablePoints;
-
     /**
      * Synchronous
      * Calculates shortest possible path, using heuristic function
@@ -62,9 +57,6 @@ public class AStar extends EventDispatcher{
 
         //if fast == true, caching is OFF
         var reachablePointsData:ReachablePoints = fast ? new ReachablePoints(startPoint) : _calculatedStartPoints.createReachables(startPoint);
-
-        _$pointsData = reachablePointsData;
-
         var openList:Vector.<PointData> = new Vector.<PointData>();
         var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
         _addToOpenList(startPointData, openList);
@@ -135,9 +127,8 @@ public class AStar extends EventDispatcher{
             _dispatchResult(_getCalculatedPath(startPoint, endPoint), callback);
             return;
         }
-
+        //if fast == true, caching is OFF
         var reachablePointsData:ReachablePoints = fast ? new ReachablePoints(startPoint) : _calculatedStartPoints.getReachablesFrom(startPoint);
-
         var openList:Vector.<PointData> = new <PointData>[];
         var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
         _addToOpenList(startPointData, openList);
@@ -270,10 +261,6 @@ public class AStar extends EventDispatcher{
         }
 
         return _result;
-    }
-
-    public function get $pointsData():Dictionary {
-        return _$pointsData.$raw;
     }
 }
 }
