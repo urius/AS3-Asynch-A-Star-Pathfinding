@@ -66,7 +66,6 @@ public class AStar extends EventDispatcher{
         _$pointsData = reachablePointsData;
 
         var openList:Vector.<PointData> = new Vector.<PointData>();
-        var closedList:Vector.<PointData> = new Vector.<PointData>();
         var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
         _addToOpenList(startPointData, openList);
 
@@ -74,21 +73,20 @@ public class AStar extends EventDispatcher{
 
         while(openList.length > 0){
             currentPoint = _pickPointWithMinF(openList, true);
-            _addToClosedList(currentPoint, closedList);
+            _addToClosedList(currentPoint);
 
             if(fast){
                 if(currentPoint.point.aStarPointId == endPoint.aStarPointId){
                     break;
                 }
             }
-            _coreProcessNeighbours(reachablePointsData, _grid, openList, closedList, currentPoint, endPoint);
+            _coreProcessNeighbours(reachablePointsData, _grid, openList, currentPoint, endPoint);
         }
 
         return _restorePath(reachablePointsData.getPointData(endPoint));
     }
 
-    private function _addToClosedList(pointData:PointData, closedList:Vector.<PointData>):void {
-        closedList.push(pointData);
+    private function _addToClosedList(pointData:PointData):void {
         pointData.inClosedList = true;
     }
 
@@ -141,14 +139,13 @@ public class AStar extends EventDispatcher{
         var reachablePointsData:ReachablePoints = fast ? new ReachablePoints(startPoint) : _calculatedStartPoints.getReachablesFrom(startPoint);
 
         var openList:Vector.<PointData> = new <PointData>[];
-        var closedList:Vector.<PointData> = new <PointData>[];
         var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
         _addToOpenList(startPointData, openList);
 
-        _findPathAsyncCore(reachablePointsData, openList, closedList, endPoint, fast, callback);
+        _findPathAsyncCore(reachablePointsData, openList, endPoint, fast, callback);
     }
 
-    private function _findPathAsyncCore(reachablePointsData:ReachablePoints, openList:Vector.<PointData>, closedList:Vector.<PointData>, endPoint:IAStarPoint, fast:Boolean, callback:Function):void {
+    private function _findPathAsyncCore(reachablePointsData:ReachablePoints, openList:Vector.<PointData>, endPoint:IAStarPoint, fast:Boolean, callback:Function):void {
         var currentPoint:PointData;
 
         var steps:int = ASYNC_ITERATION_STEPS;
@@ -156,7 +153,7 @@ public class AStar extends EventDispatcher{
             steps --;
             if(openList.length > 0){
                 currentPoint = _pickPointWithMinF(openList, true);
-                _addToClosedList(currentPoint, closedList);
+                _addToClosedList(currentPoint);
 
                 if(fast){
                     if(endPoint && currentPoint.point.aStarPointId == endPoint.aStarPointId){
@@ -164,14 +161,14 @@ public class AStar extends EventDispatcher{
                         return;
                     }
                 }
-                _coreProcessNeighbours(reachablePointsData, _grid, openList, closedList, currentPoint, endPoint);
+                _coreProcessNeighbours(reachablePointsData, _grid, openList, currentPoint, endPoint);
             } else {
                 _dispatchResult(_restorePath(reachablePointsData.getPointData(endPoint)), callback);
                 return;
             }
         }
         if(steps <= 0){
-            setTimeout(_findPathAsyncCore, 0, reachablePointsData,openList,closedList,endPoint, fast, callback);
+            setTimeout(_findPathAsyncCore, 0, reachablePointsData,openList,endPoint, fast, callback);
         }
     }
 
@@ -185,7 +182,7 @@ public class AStar extends EventDispatcher{
     }
 
 
-    private function _coreProcessNeighbours(reachablePointsData:ReachablePoints, _grid:IAStarGrid, openList:Vector.<PointData>, closedList:Vector.<PointData>,  currentPoint:PointData, endPoint:IAStarPoint):void {
+    private function _coreProcessNeighbours(reachablePointsData:ReachablePoints, _grid:IAStarGrid, openList:Vector.<PointData>, currentPoint:PointData, endPoint:IAStarPoint):void {
         var neighbours:Vector.<IAStarPoint>;
         var neighbourData:PointData;
         var neighbour:IAStarPoint;
@@ -328,8 +325,7 @@ class ReachablePoints {
         if(_reachables[point] == null){
             _reachables[point] = new PointData(point, heuristicDistance, moveCost);
         } else {
-            trace("Update Point");
-            (_reachables[point] as PointData).heuristicDistance = heuristicDistance
+            (_reachables[point] as PointData).heuristicDistance = heuristicDistance;
         }
 
         return _reachables[point];
