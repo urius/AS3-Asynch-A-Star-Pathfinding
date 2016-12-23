@@ -142,8 +142,8 @@ public class AStar extends EventDispatcher{
 
         var openList:Vector.<PointData> = new <PointData>[];
         var closedList:Vector.<PointData> = new <PointData>[];
-
-        openList.push(reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint)));
+        var startPointData:PointData = reachablePointsData.createOrUpdatePointData(startPoint, endPoint ? _grid.getHeuristicDistance(startPoint,endPoint) : 0, _grid.getMoveCost(startPoint));
+        _addToOpenList(startPointData, openList);
 
         _findPathAsyncCore(reachablePointsData, openList, closedList, endPoint, fast, callback);
     }
