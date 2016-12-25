@@ -262,6 +262,10 @@ public class AStar extends EventDispatcher{
 
         return _result;
     }
+
+    public function get grid():IAStarGrid {
+        return _grid;
+    }
 }
 }
 
